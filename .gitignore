@@ -23,7 +23,6 @@
 # Logs and databases #
 ######################
 *.log
-*.sql
 *.sqlite
 
 # OS generated files #
@@ -35,3 +34,25 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# .NET #
+########
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userprefs
+.idea/
+*.ncrunchproject
+TestResults/
+
+# ASP.NET Core user secrets #
+##############################
+**/appsettings.Local.json
+
+# Environment files #
+#####################
+.env
+.env.local
+
