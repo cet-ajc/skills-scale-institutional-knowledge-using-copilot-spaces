@@ -1,70 +1,214 @@
-# Scale institutional knowledge using Copilot Spaces
+# Clean Architecture ASP.NET Core 9 Web API
 
-Learn how Copilot Spaces can scale institutional knowledge and streamline organizational processes.
+A production-quality ASP.NET Core 9 Web API built with Clean Architecture principles, following Microsoft best practices.
 
-## What are Copilot Spaces?
+## Architecture Overview
 
-- Copilot Spaces let you organize the context that Copilot uses to answer your questions.
-- Spaces can include repositories, code, pull requests, issues, free-text content like transcripts or notes, images, and file uploads.
-- You can ask Copilot questions grounded in that context, or share the space with your team to support collaboration and knowledge sharing.
+```
+├── src/
+│   ├── CleanArchitecture.Domain/          # Enterprise business rules
+│   │   ├── Common/                        # Base entity
+│   │   ├── Entities/                      # Domain entities (User)
+│   │   ├── Exceptions/                    # Domain exceptions
+│   │   └── Interfaces/                    # Repository interfaces
+│   │
+│   ├── CleanArchitecture.Application/     # Application business rules
+│   │   ├── DTOs/                          # Data Transfer Objects
+│   │   │   ├── Requests/                  # Request DTOs
+│   │   │   └── Responses/                 # Response DTOs
+│   │   ├── Interfaces/                    # Service interfaces
+│   │   └── Services/                      # Application services
+│   │
+│   ├── CleanArchitecture.Infrastructure/  # External concerns
+│   │   ├── Data/                          # EF Core DbContext, UnitOfWork
+│   │   ├── Migrations/                    # EF Core migrations
+│   │   ├── Repositories/                  # Repository implementations
+│   │   └── Services/                      # JWT, password hashing
+│   │
+│   └── CleanArchitecture.API/             # Presentation layer
+│       ├── Controllers/                   # API controllers
+│       └── Middleware/                    # Global exception handler
+│
+└── tests/
+    └── CleanArchitecture.UnitTests/       # xUnit unit tests
+        ├── Repositories/
+        └── Services/
+```
 
-### Why use Copilot Spaces?
+## Features
 
-Whether you’re working solo or collaborating across a team, Spaces help you make Copilot more useful.
+- ✅ **Clean Architecture** – Domain → Application → Infrastructure → API
+- ✅ **Entity Framework Core 9** with SQL Server
+- ✅ **Repository & Unit of Work** pattern
+- ✅ **JWT Authentication** with role-based authorization
+- ✅ **Swagger / OpenAPI** documentation
+- ✅ **Global exception handling** middleware
+- ✅ **Structured logging** (console + debug)
+- ✅ **Dependency Injection** throughout
+- ✅ **xUnit unit tests** (16 tests, Moq + FluentAssertions)
+- ✅ **Docker support** (Dockerfile + docker-compose)
+- ✅ **Password hashing** with BCrypt
 
-#### With Copilot Spaces you can
+## Prerequisites
 
-- Get more relevant, specific answers from Copilot.
-- Stay in flow by collecting what you need for a task in one place.
-- Reduce repeated questions by sharing knowledge with your team.
-- Support onboarding and reuse with self-service context that lives beyond chat history.
-- Your spaces stay in sync as your project evolves.
-  - GitHub files and other GitHub-based sources added to a space are automatically updated as they change, making Copilot an evergreen expert in your project.
+| Tool | Version |
+|------|---------|
+| [.NET SDK](https://dotnet.microsoft.com/download/dotnet/9.0) | 9.0+ |
+| [SQL Server](https://www.microsoft.com/en-us/sql-server) | 2019+ (or Docker) |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Optional |
 
-## Welcome
+## Quick Start
 
-- **Who is this for**: Project managers, team leads, and developers looking to streamline knowledge sharing
-- **What you'll learn**: How to leverage GitHub Copilot Spaces to capture, organize, and improve project management processes
-- **What you'll build**: A comprehensive knowledge management system using Copilot Spaces for team collaboration
-- **Prerequisites**:
+### Option 1: Docker Compose (Recommended)
 
-  - Basic familiarity with GitHub repositories
-  - Access to GitHub Copilot Spaces
-  - Beginner-level project management concepts
+```bash
+# Clone the repository
+git clone <repo-url>
+cd <repo-directory>
 
-- **How long**: This exercise takes less than 30 minutes to complete.
+# Start all services (API + SQL Server)
+docker compose up --build
+```
 
-In this exercise, you will use Copilot Spaces:
+The API will be available at **http://localhost:8080** with Swagger UI at the root.
 
-1. Add a repository as a source to your Copilot Space
-1. Add instructions to your Copilot Space
-1. Create issues in the repository using Copilot Spaces
-1. Explore and summarize project management process documentation
-1. Update repository documentation based on insights and gaps discovered
+To override the default passwords, create a `.env` file:
 
-### How to start this exercise
+```env
+SA_PASSWORD=YourStrong@Passw0rd
+JWT_SECRET_KEY=your-super-secret-jwt-key-at-least-32-characters
+```
 
-Simply copy the exercise to your account, then give your favorite Octocat (Mona) **about 20 seconds** to prepare the first lesson, then **refresh the page**.
+### Option 2: Local Development
 
-[![](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=skills&template_name=scale-institutional-knowledge-using-copilot-spaces&owner=%40me&name=skills-scale-institutional-knowledge-using-copilot-spaces&description=Exercise:+Scale+Institutional+Knowledge+Using+Copilot+Spaces&visibility=public)
+**1. Configure the database connection**
 
-<details>
-<summary>Having trouble? 🤷</summary>
+Update `src/CleanArchitecture.API/appsettings.Development.json` with your SQL Server connection:
 
-When copying the exercise, we recommend the following settings:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=CleanArchitectureDb;User Id=sa;******;TrustServerCertificate=True;"
+  },
+  "JwtSettings": {
+    "SecretKey": "your-super-secret-jwt-key-at-least-32-characters"
+  }
+}
+```
 
-- For owner, choose your personal account or an organization to host the repository.
+> **Security Note:** Never commit real credentials. Use [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for local development:
+> ```bash
+> dotnet user-secrets set "JwtSettings:SecretKey" "your-secret-key" --project src/CleanArchitecture.API
+> dotnet user-secrets set "ConnectionStrings:DefaultConnection" "..." --project src/CleanArchitecture.API
+> ```
 
-- We recommend creating a public repository, since private repositories will use Actions minutes.
+**2. Run the application**
 
-If the exercise isn't ready in 20 seconds, please check the [Actions](../../actions) tab.
+```bash
+dotnet run --project src/CleanArchitecture.API
+```
 
-- Check to see if a job is running. Sometimes it simply takes a bit longer.
+The app runs at **https://localhost:5001** / **http://localhost:5000**.  
+In Development mode, Swagger UI is available at the root URL.
 
-- If the page shows a failed job, please submit an issue. Nice, you found a bug! 🐛
+## Database Migrations
 
-</details>
+Migrations are applied automatically on startup in Development. To manage manually:
 
----
+```bash
+# Add a new migration
+dotnet ef migrations add <MigrationName> \
+  --project src/CleanArchitecture.Infrastructure \
+  --startup-project src/CleanArchitecture.API
 
-&copy; 2026 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+# Apply migrations
+dotnet ef database update \
+  --project src/CleanArchitecture.Infrastructure \
+  --startup-project src/CleanArchitecture.API
+
+# Remove the last migration
+dotnet ef migrations remove \
+  --project src/CleanArchitecture.Infrastructure \
+  --startup-project src/CleanArchitecture.API
+```
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `POST` | `/api/auth/register` | Register a new user | No |
+| `POST` | `/api/auth/login` | Login and get JWT token | No |
+
+### Users
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/users` | Get all users | Admin role |
+| `GET` | `/api/users/{id}` | Get user by ID | Any authenticated |
+| `PUT` | `/api/users/{id}` | Update user | Any authenticated |
+| `DELETE` | `/api/users/{id}` | Delete user | Admin role |
+
+### Example: Register a user
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"john","email":"john@example.com","password":"Password123!"}'
+```
+
+### Example: Login
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"Password123!"}'
+```
+
+Use the returned `token` in subsequent requests:
+
+```bash
+curl http://localhost:8080/api/users \
+  -H "Authorization: ******"
+```
+
+## Running Tests
+
+```bash
+# Run all unit tests
+dotnet test tests/CleanArchitecture.UnitTests
+
+# With verbose output
+dotnet test tests/CleanArchitecture.UnitTests -v normal
+
+# With coverage (requires coverlet)
+dotnet test tests/CleanArchitecture.UnitTests --collect:"XPlat Code Coverage"
+```
+
+## Configuration Reference
+
+| Key | Description | Default |
+|-----|-------------|---------|
+| `ConnectionStrings:DefaultConnection` | SQL Server connection string | — |
+| `JwtSettings:SecretKey` | JWT signing key (≥ 32 chars) | — |
+| `JwtSettings:Issuer` | JWT issuer | `CleanArchitectureAPI` |
+| `JwtSettings:Audience` | JWT audience | `CleanArchitectureAPI` |
+| `JwtSettings:ExpiryMinutes` | Token lifetime in minutes | `60` |
+
+## Project Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `Microsoft.EntityFrameworkCore.SqlServer` | EF Core SQL Server provider |
+| `Microsoft.AspNetCore.Authentication.JwtBearer` | JWT authentication |
+| `Swashbuckle.AspNetCore` | Swagger / OpenAPI |
+| `BCrypt.Net-Next` | Password hashing |
+| `xUnit` | Unit testing framework |
+| `Moq` | Mocking library |
+| `FluentAssertions` | Readable test assertions |
+| `Microsoft.EntityFrameworkCore.InMemory` | In-memory DB for tests |
+
+## License
+
+MIT
