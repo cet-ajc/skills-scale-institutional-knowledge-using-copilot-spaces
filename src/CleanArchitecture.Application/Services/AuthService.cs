@@ -29,7 +29,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Registering new user with email: {Email}", request.Email);
+        _logger.LogInformation("Registering new user with email: {Email}", Sanitize(request.Email));
 
         var existingUser = await _unitOfWork.Users.GetByEmailAsync(request.Email, cancellationToken);
         if (existingUser is not null)
@@ -58,7 +58,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Login attempt for email: {Email}", request.Email);
+        _logger.LogInformation("Login attempt for email: {Email}", Sanitize(request.Email));
 
         var user = await _unitOfWork.Users.GetByEmailAsync(request.Email, cancellationToken)
             ?? throw new UnauthorizedException("Invalid email or password.");
@@ -97,4 +97,8 @@ public class AuthService : IAuthService
         CreatedAt = user.CreatedAt,
         UpdatedAt = user.UpdatedAt
     };
+
+    private static string Sanitize(string value) =>
+        value.Replace("\r", string.Empty, StringComparison.Ordinal)
+             .Replace("\n", string.Empty, StringComparison.Ordinal);
 }
